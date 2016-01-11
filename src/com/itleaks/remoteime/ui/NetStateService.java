@@ -24,10 +24,6 @@
 
 package com.itleaks.remoteime.ui;
 
-import com.itleaks.remoteime.model.IRemoteImeEventListener;
-import com.itleaks.remoteime.model.RemoteImePolicy;
-import com.itleaks.remoteime.model.SessionModels;
-
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -37,6 +33,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.util.Log;
+
+import com.itleaks.remoteime.model.IRemoteImeEventListener;
+import com.itleaks.remoteime.model.RemoteImePolicy;
+import com.itleaks.remoteime.model.SessionModels;
 
 public class NetStateService extends Service {
 	private final static boolean DEBUG = true;
@@ -93,7 +93,7 @@ public class NetStateService extends Service {
         		 mPolicy = new RemoteImePolicy();
         		 mPolicy.setListener((MApplication)getApplicationContext());
         	 }
-        	 SessionModels.Utils.updateLocalIpAddress();
+             SessionModels.Utils.updateLocalIpAddress(this);
          	 if (DEBUG) Log.d(TAG, "wifi is connected");
          } else {
         	 if (mPolicy != null) {

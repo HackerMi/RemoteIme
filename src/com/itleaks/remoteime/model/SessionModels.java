@@ -24,20 +24,20 @@
 
 package com.itleaks.remoteime.model;
 
+import android.content.Context;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.util.Log;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
-import java.util.Enumeration;
 import java.util.HashMap;
-
-import android.util.Log;
 
 public interface SessionModels {
 	public static final String TAG = "NetUtils";
@@ -297,23 +297,42 @@ public interface SessionModels {
 	public class Utils {
 		private static String mIp = "";
 		public static String getLocalIpAddress() {
+			Log.d(TAG, "getLocalIpAddress: " + mIp);
 			return mIp;
 		}
 		
-		public static void updateLocalIpAddress() {
-		    try {
-		        for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-		            NetworkInterface intf = en.nextElement();
-		            for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-		                InetAddress inetAddress = enumIpAddr.nextElement();
-		                if (!inetAddress.isLoopbackAddress()) {
-		                    mIp = inetAddress.getHostAddress().toString();
-		                }
-		            }
-		        }
-		    } catch (SocketException ex) {
-		        Log.e(TAG, ex.toString());
-		    }
+		public static void updateLocalIpAddress(Context context) {
+//		    try {
+//		        for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+//		            NetworkInterface intf = en.nextElement();
+//		            for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+//		                InetAddress inetAddress = enumIpAddr.nextElement();
+//		                if (!inetAddress.isLoopbackAddress()) {
+//		                    mIp = inetAddress.getHostAddress().toString();
+//		                }
+//		            }
+//		        }
+//		    } catch (SocketException ex) {
+//		        Log.e(TAG, ex.toString());
+//		    }
+			WifiManager manager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
+			if (!manager.isWifiEnabled()) {
+				Log.d(TAG, "wifi not enable");
+				return;
+			}
+
+			WifiInfo info = manager.getConnectionInfo();
+			if (info == null) {
+				Log.d(TAG, "get wifi info failed!");
+				return;
+			}
+
+			mIp = intToString(info.getIpAddress());
+		}
+
+		private static String intToString(int i) {
+			return (i & 0xFF) + "." + ((i >> 8) & 0xFF) + "." + ((i >> 16) & 0xFF) + "."
+					+ ((i >> 24) & 0xFF);
 		}
 	}
 }
